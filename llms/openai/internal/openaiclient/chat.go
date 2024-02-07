@@ -135,11 +135,16 @@ func (c *Client) createChat(ctx context.Context, payload *ChatRequest) (*ChatRes
 	if payload.StreamingFunc != nil {
 		payload.Stream = true
 	}
-	// Build request payload
-	payloadBytes, err := json.Marshal(payload)
+
+	var buf bytes.Buffer
+	encoder := json.NewEncoder(&buf)
+	encoder.SetEscapeHTML(false)
+	err := encoder.Encode(payload)
 	if err != nil {
 		return nil, err
 	}
+
+	payloadBytes := buf.Bytes()
 
 	// Build request
 	body := bytes.NewReader(payloadBytes)
